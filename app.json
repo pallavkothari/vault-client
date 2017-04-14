@@ -1,0 +1,11 @@
+{
+  "name": "vault client",
+  "description": "demo reading from a vault server",
+  "repository": "https://github.com/pallavkothari/vault-client",
+  "keywords": ["vault", "client"],
+  "env": {
+    "VAULT_TOKEN": {
+      "description": "vault token",
+      "required": true
+    }
+}
