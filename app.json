@@ -7,5 +7,9 @@
     "VAULT_TOKEN": {
       "description": "vault token",
       "required": true
+    },
+    "VAULT_HOST": {
+      "description": "vault host",
+      "required": true
     }
 }
