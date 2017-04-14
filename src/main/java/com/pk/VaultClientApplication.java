@@ -3,6 +3,7 @@ package com.pk;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.squareup.okhttp.OkHttpClient;
@@ -35,17 +36,18 @@ public class VaultClientApplication {
         return secrets.toString();
     }
 
-    private JsonObject getData(String vaultResponse) {
-        JsonObject jsonObject = new Gson().fromJson(vaultResponse, JsonObject.class);
-        return jsonObject.get("data").getAsJsonObject();
-    }
-
     @RequestMapping("/aws")
     public String getAwsCredentials() throws Exception {
-        return askVault("/aws/creds/test").toString();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonObject jsonObject = gson.fromJson(askVaultRaw("/aws/creds/test"), JsonObject.class);
+        return "<pre>" + gson.toJson(jsonObject) + "</pre>";
     }
 
     private JsonObject askVault(String reqPath) throws IOException {
+        return getData(askVaultRaw(reqPath));
+    }
+
+    private String askVaultRaw(String reqPath) throws IOException {
         Request req = new Request.Builder()
                 .url(VAULT_HOST + "/v1" + reqPath)
                 .get()
@@ -54,8 +56,13 @@ public class VaultClientApplication {
         Response response = client.newCall(req).execute();
         try (ResponseBody body = response.body()) {
             Preconditions.checkState(response.isSuccessful());
-            return getData(body.string());
+            return body.string();
         }
+    }
+
+    private JsonObject getData(String vaultResponse) {
+        JsonObject jsonObject = new Gson().fromJson(vaultResponse, JsonObject.class);
+        return jsonObject.get("data").getAsJsonObject();
     }
 
     public static void main(String[] args) {
