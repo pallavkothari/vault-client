@@ -55,7 +55,9 @@ public class VaultClientApplication {
                 .build();
         Response response = client.newCall(req).execute();
         try (ResponseBody body = response.body()) {
-            Preconditions.checkState(response.isSuccessful());
+            if (!response.isSuccessful()) {
+                throw new RuntimeException(body.string());
+            }
             return body.string();
         }
     }
